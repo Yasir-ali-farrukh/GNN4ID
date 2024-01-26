@@ -1,0 +1,2 @@
+nfstream >= 6.5.3
+pytorch >= 2.1.1
