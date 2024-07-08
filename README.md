@@ -14,7 +14,7 @@ The input files required for GNN4ID are labeled pcap files or labeled packet inf
 3. `GNN4ID_Heterogenous_Model.ipynb`: This notebook provides details on training and testing a GNN model. We have incorporated two different models, one with edge attributes and another without edge attributes.
 
 To start, you can begin with `GNN4ID.ipynb`, as it provides comprehensive details on information extraction from pcap files and the creation of graph models. For ease of computation, you should follow the steps in `Data_preprocessing_CIC-IoT2023.ipynb` before creating the data objects (as highlighted in the notebook). Lastly, `GNN4ID_Heterogenous_Model.ipynb` provides a baseline on how to develop a model, train it, and test it.
-
 </p>
+
 ## Requirement
 
