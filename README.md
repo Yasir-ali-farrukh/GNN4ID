@@ -12,9 +12,31 @@ The input files required for GNN4ID are labeled pcap files or labeled packet inf
 1. `GNN4ID.ipynb`: This notebook provides instructions on how to handle pcap files for flow and packet-level information extraction and how to transform the extracted flow and packet-level information into graph data objects. You can either create the graph data objects directly or use the extracted combined information of flow and packet for your own use case.
 2. `Data_preprocessing_CIC-IoT2023.ipynb`: This notebook details the preprocessing of the CIC-IoT2023 dataset, specifically addressing the issue of class imbalance and providing the dataset sample size for our example.
 3. `GNN4ID_Heterogenous_Model.ipynb`: This notebook provides details on training and testing a GNN model. We have incorporated two different models, one with edge attributes and another without edge attributes.
-
-To start, you can begin with `GNN4ID.ipynb`, as it provides comprehensive details on information extraction from pcap files and the creation of graph models. For ease of computation, you should follow the steps in `Data_preprocessing_CIC-IoT2023.ipynb` before creating the data objects (as highlighted in the notebook). Lastly, `GNN4ID_Heterogenous_Model.ipynb` provides a baseline on how to develop a model, train it, and test it.
 </p>
 
-## Requirement
+To start, you can begin with `GNN4ID.ipynb`, as it provides comprehensive details on information extraction from pcap files and the creation of graph models. For ease of computation, you should follow the steps in `Data_preprocessing_CIC-IoT2023.ipynb` before creating the data objects (as highlighted in the notebook). Lastly, `GNN4ID_Heterogenous_Model.ipynb` provides a baseline on how to develop a model, train it, and test it.
+
+## Graph Data Modeling
+<p align="justify">
+To model network traffic data into a graph data structure, we have utilized the relationships between packets and how combined packets are used to create flow information. By leveraging this connection, we can transform network traffic into graph objects. We adopted heterogeneous graph modeling as it allows us to model two distinct types of nodes with their own attributes. Specifically, we used flow information as one node type and packet information as another. Consequently, our graph comprises flow nodes connected with their respective packets.
+
+<p align="justify">
+For our experimentation and real-time detection, we set a limit on the maximum number of packets in a flow to 20. This means that if a flow contains 20 packets, the flow is terminated, and a new flow is computed. This approach ensures real-time detection, preventing flows from containing a large number of packets, which could lead to several minutes of delay.
+
+<p align="justify">
+As we have two types of nodes, we also have two different types of edges: link edges and contain edges. The link edges connect packet nodes to packet nodes, while the contain edges connect flow nodes to packet nodes. The attributes of each node and edge are as follows:
+
+1. Flow Node: 53 Features (Statistical Flow Features)
+2. Packet Node: 1500 Features (Payload Data Byte-wise)
+3. Contain Edge: 4 Features (Information of different packet layer sizes)
+4. Link Edge: 1 Feature (Time delta between each consecutive packet)
+
+A pictorial representation of the graph object is provided below:
+
+<p align="center">
+  <img src="https://github.com/Yasir-ali-farrukh/GNN4ID/assets/93033074/9cf49fed-b68a-4440-bc81-39fbb40afb00" width="400" height="300">
+</p>
+
+
+
 
