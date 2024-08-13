@@ -24,7 +24,7 @@ def initialize_llm(cache_dir = "/scratch/user/syedwali/Python_env/myGNN/LLM/llam
 
 
 def initialize_finetuned_llm(base_model_id = "/scratch/user/syedwali/Python_env/myGNN/LLM/llama",
-                            fine_tuned_directory=  "/scratch/user/syedwali/llama2-7b-train-finetune/"):
+                            fine_tuned_directory=  "/scratch/user/syedwali/llama-train-finetune/"):
 
 
     # Check if CUDA is available and set the device
@@ -38,7 +38,7 @@ def initialize_finetuned_llm(base_model_id = "/scratch/user/syedwali/Python_env/
     )
 
     base_model = AutoModelForCausalLM.from_pretrained(
-        base_model_id,  # Llama 2 7B, same as before
+        base_model_id,  # Llama , same as before
         quantization_config=bnb_config,  # Same quantization config as before
         device_map="auto",
         trust_remote_code=True
