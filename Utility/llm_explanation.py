@@ -65,7 +65,7 @@ def test_with_explanation(loader, model,llm_model, tokenizer, fine_tune= False,d
     all_preds = []
     all_labels = []
     explanations=[]
-    #i=0
+    
     for batch in (tqdm(loader)):
         batch.to('cuda')
         with torch.no_grad():
@@ -77,7 +77,7 @@ def test_with_explanation(loader, model,llm_model, tokenizer, fine_tune= False,d
         # Explain predicted outcome using LLM
         
         predicted_class=label.item();
-        #print("Processing Data Instance: ", i)
+        
         response=generate_explanation(llm_model, tokenizer, predicted_class, flow_imp,packet_imp, flow_input, packet_input,fine_tune,top_features=5,prompt_lengt=1500,stopping_criteria=True)
         
         all_preds.append(pred.cpu().detach().numpy())
@@ -85,11 +85,7 @@ def test_with_explanation(loader, model,llm_model, tokenizer, fine_tune= False,d
         explanations.append(response)
         correct += pred.eq(label).sum().item()
         num_graphs += batch.num_graphs
-        #i+=1
-        # if predicted_class==7:
-        #     return correct / num_graphs, all_preds, all_labels, explanations
-        #print('explain')
-        #explain_prediction(model, batch, device)
+        
     all_preds = np.concatenate(all_preds).ravel()
     all_labels = np.concatenate(all_labels).ravel()
     calculate_metrics(all_preds, all_labels)
