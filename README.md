@@ -1,4 +1,4 @@
-# <img src="https://github.com/user-attachments/assets/d29a73cc-120b-48e5-8e32-b3155410f586" width="120" valign="middle" alt="Scapy" />&nbsp; GNN4ID
+# <img src="https://github.com/user-attachments/assets/1f788a19-dffa-4a93-b780-c767c03de45d" width="120" valign="middle" alt="Scapy" />&nbsp; GNN4ID
 
 <p align="justify">GNN4ID is a tool designed to transform raw packet capture files (PCAP) of network traffic into structured graph-based datasets. This tool uniquely integrates both flow and packet-level information, providing a comprehensive view of network activity. Developed to facilitate research in Graph Neural Networks (GNNs) for Network Intrusion Detection Systems (NIDS), GNN4ID empowers users to seamlessly extract flow-level information along with its respective packet-level information, which is ultimately combined to form a graph-based dataset. The developed graph-based dataset utilizes both flow-level and packet-level information. </p>
 
@@ -36,9 +36,8 @@ As we have two types of nodes, we also have two different types of edges: link e
 
 A pictorial representation of the graph object is provided below:
 
-
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f9b971d2-848e-49de-94d2-ced5ca047d95" width="400" height="300">
+  <img src="https://github.com/user-attachments/assets/cd55c744-7227-4b49-a970-2729bd8c0de6" width="400" height="300">
 </p>
 
 ## Citation 
