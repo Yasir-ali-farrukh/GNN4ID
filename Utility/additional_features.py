@@ -4,14 +4,14 @@ from sklearn.preprocessing import LabelEncoder
 
 def additional_features(file_name,window_size=350,http_ports = [443, 8080,80],
                        vulnerable_ports = [20, 21, 22, 23, 25, 53, 80, 110, 143, 443, 445, 3389, 8080],
-                       dns_ports=[53]):
+                       dns_ports=[53], exp_id = [0,-1], proto_list=[1,2,6,17,58]):
     try:
         data=pd.read_csv(file_name)
     except:
         print("file reading error")
         return ""
     try:
-        data = data.sort_values(by='src2dst_first_seen_ms')
+        data = data.sort_values(by='bidirectional_first_seen_ms')
     except:
         print (" CSV does not contain src2dst_first_seen_ms for initial sorting ")
         return ""
@@ -31,6 +31,7 @@ def additional_features(file_name,window_size=350,http_ports = [443, 8080,80],
     def dur_packets_in_window(group, window_size):
         return group.rolling(window=window_size, min_periods=1).mean()
         
+  
     # Initialize LabelEncoder for reference features
     label_encoder = LabelEncoder()
     label_encoder2 = LabelEncoder()
@@ -99,7 +100,15 @@ def additional_features(file_name,window_size=350,http_ports = [443, 8080,80],
     data['Rolling_packets_destination'] = data.groupby('dst_ip_encoded')['src2dst_packets'].apply(lambda x: icmp_requests_in_window(x, window_size)).reset_index(level=0, drop=True)
     data['Rolling_bipackets_destination'] = data.groupby('dst_ip_encoded')['bidirectional_packets'].apply(lambda x: icmp_requests_in_window(x, window_size)).reset_index(level=0, drop=True)
 
+
+    # One Hot 
+    data['expiration_id']= pd.Categorical(data['expiration_id'], categories=exp_id)
+    data['protocol']=pd.Categorical(data['protocol'], categories=proto_list)
+    data=pd.get_dummies(data, prefix=['Exp','proto'], columns=['expiration_id', 'protocol'],dtype=int)
+
+
     data.drop(['src_dst_ip','src_dst_encoded','dst_ip_encoded','is_udp_request','is_tcp_request','is_icmp_request','is_vulnerable_port'],axis=1,inplace=True)
-    return data
+
+    data.to_csv(file_name,index=False)
     
             

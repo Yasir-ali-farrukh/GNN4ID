@@ -7,7 +7,9 @@ import re
 import glob
 from torch_geometric.data import HeteroData
 from torch_geometric.data import Dataset, Data
+import torch_geometric.transforms as T
 import sys
+import random
 
 
 class NIDSDataset(Dataset):
@@ -441,3 +443,107 @@ def random_pick_rows(df, original, over):
         row_to_duplicate = random.randint(0, original.shape[0]-1)
         df = pd.concat([df, original.iloc[row_to_duplicate:row_to_duplicate+1]], ignore_index=True)
     return df
+
+
+
+def Combining_classes(directory,classes_list,Number_in_individaul_class=20000, Number_of_test_samples=4000, label_dict= {'Benign': 0,'WebBased': 1,'Spoofing': 2,'Recon': 3,'Mirai': 4,'Dos' : 5,'DDos': 6,'BruteForce': 7}):
+    
+    """
+    Combines CSV files from specified classes into a single DataFrame, 
+    ensuring a consistent number of samples for each class, and creates training and test datasets.
+
+    Args:
+        directory (str): The path to the directory containing the CSV files.
+        classes_list (list): List of classes to combine.
+        Number_in_individual_class (int): Target number of train samples per class.
+        Number_of_test_samples (int): Target number of test samples per class.
+        label_dict (dict): Dictionary mapping class names to labels.
+
+    Returns:
+        None: The function saves the training and test datasets as CSV files.
+    """
+    for each_class in tqdm(classes_list):
+        df_list = []
+        List_of_CSV_File =glob.glob(directory+each_class+"*")
+        # Load each file and append the dataframe to the list
+        for file in List_of_CSV_File:
+            df = pd.read_csv(file)
+            name_file = file.split('\\')[-1]
+            name_file = name_file.split('.')[-2]
+            name_file = name_file.split('-')[0]
+            df_list.append(df)
+        
+        final_df = pd.concat(df_list, ignore_index=True)
+        
+        if final_df.shape[0]<=Number_in_individaul_class:
+            final_df = duplicate_rows(final_df,Number_in_individaul_class)
+        else:
+            fraction = Number_in_individaul_class/final_df.shape[0]
+            final_df = final_df.sample(frac=fraction)    
+        
+        final_df['Label'] = label_dict[name_file]
+        # Directory for saving
+        train_file_path = os.path.dirname(file)+'\\train\\'+name_file+'_train.csv'
+        # Creating the Directory
+        if not os.path.exists(os.path.dirname(train_file_path)): 
+            os.makedirs(os.path.dirname(train_file_path))
+        
+        final_df.to_csv(train_file_path, index=False)
+
+        ## For Test Data
+        List_of_CSV_File =glob.glob(directory+"test\\"+each_class+"*")
+        df_list = []
+        for file in List_of_CSV_File:
+            df = pd.read_csv(file)
+            name_file = file.split('\\')[-1]
+            name_file = name_file.split('.')[-2]
+            name_file = name_file.split('-')[0]
+            df_list.append(df)
+            os.remove(file) 
+
+        final_df = pd.concat(df_list, ignore_index=True)
+        final_df['Label'] = label_dict[name_file]
+        if final_df.shape[0]>Number_of_test_samples:
+            final_df = final_df.sample(n = Number_of_test_samples, random_state=42)
+        test_file_path = os.path.dirname(file)+'\\'+name_file+'_test.csv'
+        final_df.to_csv(test_file_path, index=False)
+
+def split_csv(file_path, test_sample = 4000 , Number_in_individaul_class=20000):
+    """
+    Splits a CSV file into training and test datasets based on specific criteria for benign and attack traffic.
+
+    Args:
+        file_path (str): The path to the CSV file.
+        test_sample (int): Number of test samples to extract.
+        Number_in_individual_class (int): Number of training samples per class.
+
+    Returns:
+        None: The function saves the training and test datasets as CSV files.
+    """
+    # Load the CSV file
+    df = pd.read_csv(file_path)
+    name_file = file_path.split('\\')[-1]
+    name_file = name_file.split('.')[-2]
+    # Name for filtering the Mac-addresses
+    name_check = name_file.split('-')[0]
+    
+    if name_check == 'Benign':
+        df[(df['src_mac']!='dc:a6:32:dc:27:d5') & (df['src_mac']!='e4:5f:01:55:90:c4') & (df['src_mac']!='dc:a6:32:c9:e4:ab') & (df['src_mac']!='ac:17:02:05:34:27') & (df['src_mac']!='dc:a6:32:c9:e5:a4') & (df['src_mac']!='dc:a6:32:c9:e4:d5') & (df['src_mac']!='dc:a6:32:c9:e5:ef') & (df['src_mac']!='dc:a6:32:c9:e4:90') & (df['src_mac']!='b0:09:da:3e:82:6c') & (df['dst_mac']!='dc:a6:32:dc:27:d5') & (df['dst_mac']!='e4:5f:01:55:90:c4') & (df['dst_mac']!='dc:a6:32:c9:e4:ab') & (df['dst_mac']!='ac:17:02:05:34:27') & (df['dst_mac']!='dc:a6:32:c9:e5:a4') & (df['dst_mac']!='dc:a6:32:c9:e4:d5') & (df['dst_mac']!='dc:a6:32:c9:e5:ef') & (df['dst_mac']!='dc:a6:32:c9:e4:90') & (df['dst_mac']!='b0:09:da:3e:82:6c')]
+    else:
+        df=df[(df['src_mac']=='dc:a6:32:dc:27:d5') | (df['src_mac']=='e4:5f:01:55:90:c4') | (df['src_mac']=='dc:a6:32:c9:e4:ab') | (df['src_mac']=='ac:17:02:05:34:27') | (df['src_mac']=='dc:a6:32:c9:e5:a4') | (df['src_mac']=='dc:a6:32:c9:e4:d5') | (df['src_mac']=='dc:a6:32:c9:e5:ef') | (df['src_mac']=='dc:a6:32:c9:e4:90') | (df['src_mac']=='b0:09:da:3e:82:6c') | (df['dst_mac']=='dc:a6:32:dc:27:d5') | (df['dst_mac']=='e4:5f:01:55:90:c4') | (df['dst_mac']=='dc:a6:32:c9:e4:ab') | (df['dst_mac']=='ac:17:02:05:34:27') | (df['dst_mac']=='dc:a6:32:c9:e5:a4') | (df['dst_mac']=='dc:a6:32:c9:e4:d5') | (df['dst_mac']=='dc:a6:32:c9:e5:ef') | (df['dst_mac']=='dc:a6:32:c9:e4:90') | (df['dst_mac']=='b0:09:da:3e:82:6c')]
+    
+    if df.shape[0] > 35000:
+        df_test = df.sample(n = test_sample, random_state=42)
+        df = df.drop(df_test.index)
+        df = df.sample(n = Number_in_individaul_class, random_state=42)
+    else:
+        df_test = df.sample(frac=0.2, random_state=42)
+        df = df.drop(df_test.index)
+        
+    test_file_path = os.path.dirname(file_path)+'\\test\\'+name_file+'_test.csv'
+    
+    if not os.path.exists(os.path.dirname(test_file_path)): # Creating the Directory
+        os.makedirs(os.path.dirname(test_file_path))
+        
+    df_test.to_csv(test_file_path, index=False)
+    df.to_csv(file_path, index=False)

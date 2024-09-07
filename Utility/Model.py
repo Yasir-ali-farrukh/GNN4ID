@@ -4,7 +4,7 @@ import torch_geometric.nn as pyg_nn
 import torch
 import torch.nn as nn
 
-import deepsnap
+# import deepsnap
 
  
 
@@ -48,7 +48,7 @@ class HeteroGNNConv(pyg_nn.MessagePassing):
         )
 
     def message_and_aggregate(self, edge_index, node_feature_src):
-        out = matmul(edge_index, node_feature_src, reduce="mean")
+        out = torch.matmul(edge_index, node_feature_src, reduce="mean")
         return out
 
     def update(self, aggr_out, node_feature_dst):
@@ -59,7 +59,7 @@ class HeteroGNNConv(pyg_nn.MessagePassing):
         return aggr_out
 
 
-class HeteroGNNWrapperConv(deepsnap.hetero_gnn.HeteroConv):
+class HeteroGNNWrapperConv():
     def __init__(self, convs, args, aggr="mean"):
         super(HeteroGNNWrapperConv, self).__init__(convs, None)
         self.aggr = aggr
