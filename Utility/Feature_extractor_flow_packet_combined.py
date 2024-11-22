@@ -98,7 +98,7 @@ if __name__ == '__main__':
     path_dir = args.Destination_path
 
 
-    NFS = NFStreamer(source=pcap_files ,accounting_mode=1, idle_timeout=5, statistical_analysis=True, n_dissections=0, udps=My_Custom(limit=20))
+    NFS = NFStreamer(source=pcap_files ,accounting_mode=1, idle_timeout=120, statistical_analysis=True, n_dissections=0, udps=My_Custom(limit=20))
     print("*** Done Reading ***")
     name = os.path.basename(pcap_files)
     name = name.split('.')[0]
